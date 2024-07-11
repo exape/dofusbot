@@ -1,0 +1,39 @@
+
+# Template reading from /ressource/
+# template = cv.imread('ressource/pierre.png', cv.IMREAD_GRAYSCALE)
+# assert template is not None, "error no template available"
+
+# Methods
+# methods = [
+#     cv.TM_CCOEFF_NORMED,
+#     cv.TM_CCORR_NORMED
+# ]
+
+# def screenToCoords():
+#     # Take screenshot
+#     with mss.mss() as sct:
+#         monitor = sct.monitors[1]
+#         screenshot = sct.grab(monitor)
+#         img = np.array(screenshot)
+
+#     # Convert to grey
+#     imggray = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+#     res = cv.matchTemplate(imggray, template, methods[0])
+#     threshold = 0.5
+#     loc = np.where(res >= threshold)
+#     istheretiles = len(loc[0])
+#     coords = []
+#     if istheretiles > 1:
+#         print("something to collect detected")
+#         for pt in zip(*loc[::-1]):
+#             coords += [(pt[0], pt[1])]
+#         coords.sort(key=lambda x: math.sqrt((x[0] - 960) ** 2 + (x[1] - 540) ** 2))
+#         print("clicking on the closest one: ", coords[0])
+#         clicktile(coords[0])
+#     else:
+#         print("None found")
+    
+# def clicktile(coordinates):
+#     pyautogui.click(button="right", x=coordinates[0], y=coordinates[1])
+
+# screenToCoords()
