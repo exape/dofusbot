@@ -3,12 +3,4 @@ train: images\train
 val: images\train
 
 names:
-  0: fer
-  1: cuivre
-  2: bronze
-  3: kobalte
-  4: etain
-  5: argent
-  6: or
-  7: manganèse
-  8: silicate
+  0: ore

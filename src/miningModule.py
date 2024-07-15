@@ -20,7 +20,7 @@ class Mining:
     def find(self):
         print("DEBUG: Using yolov8 nano")
         
-        model = YOLO("src/last.pt")
+        model = YOLO("best.pt")
 
         image = self.doScreenshot()
         image = image[:,:,:3]
