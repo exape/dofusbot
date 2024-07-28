@@ -2,8 +2,6 @@ from src import miningModule
 
 mining = miningModule.Mining()
 
-# main()
-# Dofusbot entry point
 def main():
     print("Saisir la ressource souhaitée:")
     print("1 pour le minage")

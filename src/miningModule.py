@@ -8,46 +8,69 @@ import time
 
 class Mining:
 
+    def setupMining(self):
+        print("Mining selectionné")
+        self.mine()
+
+    def pointCursorToOre(self, coordinates):
+        x, y = coordinates[0], coordinates[1]
+        pyautogui.moveTo(x, y)
+
+    def clickOre(self, coordinates):
+        x, y = coordinates[0], coordinates[1]
+        pyautogui.click(x, y)
+
     def doScreenshot(self):
         with mss.mss() as sct:
             monitor = sct.monitors[1]
             screenshot = sct.grab(monitor)
             img = np.array(screenshot)
         return img
-    
-    def setupMining(self):
-        print("Mining selectionné")
-        self.mine()
             
-    def findOre(self):
-        print("=========================================")
-        coordinates = []
+    def findOre(self, image):
+        coordinates_list = []
         now = datetime.datetime.now()
         current_time = now.strftime("%H:%M:%S")
         model = YOLO("best.pt")
-        image = self.doScreenshot()
-        image2 = image
         image = image[:,:,:3]
         results = model.predict(image, conf=.7)
         for box in results[0].boxes:
             box_coordinates = (box.xyxy).tolist()[0]
-            left, top, right, bottom = box_coordinates[0], box_coordinates[1], box_coordinates[2], box_coordinates[3]
-            cv2.rectangle(image2, (int(left), int(top)), (int(right), int(bottom)), (255, 0, 0), 2)
-            x = int((left + right) / 2)
-            y = int((top + bottom) / 2)
-            cv2.circle(image2, (x, y), 2, (255, 0, 0), 2)
-            coordinate = (x,y)
-            coordinates.append(coordinate)
-            print("findOre: " + "Minerais trouvé(s) à " + current_time)
-            return coordinates
-        return None
+            left, top, right, bottom = int(box_coordinates[0]), int(box_coordinates[1]), int(box_coordinates[2]), int(box_coordinates[3])
+            box_coordinates = (left, top, right, bottom)
+            x = ((left + right) / 2)
+            y = ((top + bottom) / 2)
+            coordinate = ((x,y), box_coordinates)
+            coordinates_list.append(coordinate)
+        if(len(coordinates_list) != 0):
+            print("findOre: " + str(len(coordinates_list)) + " minerais trouvé(s) à " + current_time)
+            return coordinates_list
+        else:
+            return None
 
-    def filterOre(self, coordinates):
-        print("=========================================")
-        print("filterOre: " + " Filtrage des minerais présents sur la map")
-        print(coordinates[0])
-
+    def filterOre(self, coordinates, image):
+        mask = np.zeros(image.shape[:2], dtype="uint8")
+        left, top, right, bottom = coordinates[1][0], coordinates[1][1], coordinates[1][2], coordinates[1][3]
+        cv2.rectangle(mask, (left - 200, top - 200), (right + 200, bottom + 200), (255, 255, 255), -1)
+        image = cv2.bitwise_and(image, image, mask=mask)
+        cv2.imshow("test", image)
+        cv2. waitKey(0)
+        # TODO: read text from image cropped
+        # If the player has the level to mine the ore, return true
+        return True
+        
     def mine(self):
-        coordinates = self.findOre()
-        if coordinates is not None:
-            self.filterOre(coordinates)
+        try:
+            while True:
+                image = self.doScreenshot()
+                coordinates_list = self.findOre(image)
+                if coordinates_list is not None:
+                    for coordinates in coordinates_list:
+                        self.pointCursorToOre(coordinates[0])
+                        time.sleep(.5)
+                        image_with_ore_selected = self.doScreenshot()
+                        adequate_level = self.filterOre(coordinates, image_with_ore_selected)
+                else:
+                    print("mine: " + "Aucun minerai trouvé sur l'écran")
+        except KeyboardInterrupt:
+            print("Interruption du programme par ctrl+c")
