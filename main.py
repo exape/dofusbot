@@ -1,6 +1,6 @@
-from src import miningModule
+from src.tools import Mining
 
-mining = miningModule.Mining()
+mining = Mining()
 
 def main():
     print("Saisir la ressource souhaitée:")
@@ -15,4 +15,5 @@ def main():
         case _:
             print("Erreur de saisie. Veuillez vérifier la syntaxe et ré-essayer.")
             exit(1)
+
 main()
