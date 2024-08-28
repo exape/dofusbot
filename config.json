@@ -1,0 +1,11 @@
+{
+  "orelist": ["fer", "kobalte", "bronze", "cuivre", "silicate", "etain"],
+  "regexlist": [
+    "fer|fe",
+    "kobalte|kobalt|kobal|koba",
+    "bronze|bronz|bron|bro",
+    "cuivre|cuivr|cuiv|cui",
+    "silicate|silicat|silica",
+    "etain|etai|eta"
+  ]
+}

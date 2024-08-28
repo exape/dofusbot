@@ -7,13 +7,27 @@ from src.ore import Ore
 import pytesseract
 import time
 import asyncio
+import json
+import re
+import unidecode
 
 class Mining:
 
+    # Model for ore detection
     model = YOLO("best.pt")
+    # JSON loads
+    config = json.load(open("config.json"))
+    ore_list = config["orelist"]
+    regex_list = config["regexlist"]
+    # Text filter when reading an image
+    filter_alphanumeric = re.compile('[^a-zA-Z]')
 
     def setupMining(self) -> None:
-        print("Mining selectionné")
+        print("****************")
+        print("Mining selectionné, liste des minerais à chercher:")
+        for ore in self.ore_list:
+            print(ore)
+        print("****************")
         self.mine()
 
     def mine(self) -> None:
@@ -30,11 +44,18 @@ class Mining:
                         loop = asyncio.get_event_loop()
                         task = loop.create_task(self.filterOre(ore, image_with_ore_selected))
                         result = loop.run_until_complete(task)
-                        if "fer" in result.lower():
-                            print("mine: " + "Fer trouvé")
-                            self.clickOre(ore)
-                        else:
-                            print("mine: " + "minerai non reconnu")
+                        # Preparing text to remove false positives from text reading
+                        result = result.replace("\n", "")
+                        result = result.replace(" ", "")
+                        result = unidecode.unidecode(result)
+                        result = self.filter_alphanumeric.sub('', result).lower()
+                        # Finding an occurence on the given string
+                        for regex in self.regex_list:
+                            # Find the ore name in the messy string
+                            match = re.search(regex, result)
+                            if match is not None:
+                                print("J'ai trouvé un minerai qui est dans la config:")
+                                print(match.group())
                 else:
                     print("mine: " + "Aucun minerai trouvé sur l'écran")
         except KeyboardInterrupt:
@@ -69,7 +90,6 @@ class Mining:
             return None
 
     async def filterOre(self, ore: Ore, image) -> str:
-        print("filtering...")
         # Crop image to a smaller region (TODO: crop based on screen %)
         mask = np.zeros(image.shape[:2], dtype="uint8")
         cv2.rectangle(mask, (ore.left, ore.top - 100), (ore.right + 200, ore.bottom), (255, 255, 255), -1)
