@@ -23,11 +23,9 @@ class Mining:
     filter_alphanumeric = re.compile('[^a-zA-Z]')
 
     def setupMining(self) -> None:
-        print("****************")
         print("Mining selectionné, liste des minerais à chercher:")
         for ore in self.ore_list:
             print(ore)
-        print("****************")
         self.mine()
 
     def mine(self) -> None:
@@ -49,13 +47,16 @@ class Mining:
                         result = result.replace(" ", "")
                         result = unidecode.unidecode(result)
                         result = self.filter_alphanumeric.sub('', result).lower()
-                        # Finding an occurence on the given string
+                        # Finding an occudrence on the given string
                         for regex in self.regex_list:
                             # Find the ore name in the messy string
                             match = re.search(regex, result)
                             if match is not None:
                                 print("J'ai trouvé un minerai qui est dans la config:")
                                 print(match.group())
+                                self.clickOre(ore=ore)
+                                time.sleep(5)
+                                break
                 else:
                     print("mine: " + "Aucun minerai trouvé sur l'écran")
         except KeyboardInterrupt:
